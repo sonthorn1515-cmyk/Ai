@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,30 +11,23 @@
   --border: rgba(0, 229, 255, 0.15); --border2: rgba(217, 0, 255, 0.2);
   --a1: #00e5ff; --a2: #d900ff; --text: #e0fbfc; --muted: #6b6b8a; --muted2: #8a8aab;
 }
-
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
-
 nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 64px; background: rgba(9,2,18,0.85); border-bottom: 1px solid var(--border); }
 .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: white; text-decoration: none; }
 .logo .accent { color: var(--a1); text-shadow: 0 0 10px rgba(0,229,255,0.3); }
-
-.nav-pills { display: flex; gap: 4px; }
-.nav-pill { padding: 8px 20px; border-radius: 6px; font-size: 14px; font-weight: 700; color: var(--muted2); cursor: pointer; border: 1px solid transparent; background: transparent; font-family: 'Space Mono', monospace; transition: all 0.2s; }
-.nav-pill.active { color: var(--a1); background: rgba(0,229,255,0.1); border-color: var(--a1); }
-
-.wrapper { max-width: 1320px; margin: 0 auto; padding: 40px 40px; }
-.studio { display: grid; grid-template-columns: 1fr 420px; gap: 20px; align-items: start; }
+.wrapper { max-width: 1320px; margin: 0 auto; padding: 40px 20px; }
+.studio { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
+@media (min-width: 768px) { .studio { grid-template-columns: 1fr 420px; } }
 .panel-card { background: var(--s1); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
 .panel-header { padding: 14px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
 .panel-title { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--a1); }
 .panel-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-
 .prompt-ta { width: 100%; min-height: 120px; background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 14px; outline: none; }
 .field-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted2); margin-bottom: 8px; display: block; }
-.setting-select { width: 100%; background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; color: var(--a1); font-family: 'Space Mono', monospace; font-size: 13px; text-align: left; }
-
+.setting-select { width: 100%; background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 13px; text-align: left; }
 .gen-btn { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--a1), var(--a2)); color: #000; border: none; border-radius: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; cursor: pointer; font-weight: bold; }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .preview-screen { aspect-ratio: 16/9; background: #000; border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; color: var(--muted); text-align: center; padding: 20px;}
 </style>
 </head>
@@ -42,90 +35,128 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 
 <nav>
   <a href="#" class="logo">VI<span class="accent">XEL</span></a>
-  <div class="nav-pills">
-    <button class="nav-pill active" onclick="switchEngine('t2v', this)">🎬 Text to Video</button>
-    <button class="nav-pill" onclick="switchEngine('i2v', this)">🖼️ Image to Video</button>
-  </div>
 </nav>
 
 <div class="wrapper">
   <div class="studio">
     <div class="input-panel">
+
+      <div class="panel-card" style="border-color: var(--a2);">
+        <div class="panel-header"><span class="panel-title">⚙️ API Settings (ខួរក្បាល AI)</span></div>
+        <div class="panel-body">
+          <span class="field-label">Replicate API Key (ត្រូវតែមាន)</span>
+          <input type="password" id="api-key" class="setting-select" placeholder="Paste កូដ r8_... នៅទីនេះ">
+          <span style="font-size: 11px; color: var(--muted2);">កូដនេះមានសុវត្ថិភាព ១០០% ព្រោះវាដំណើរការតែនៅលើទូរស័ព្ទរបស់អ្នកប៉ុណ្ណោះ។</span>
+        </div>
+      </div>
       
       <div id="t2v-engine" class="active">
         <div class="panel-card">
-          <div class="panel-header"><span class="panel-title">Text to Video Prompt</span></div>
+          <div class="panel-header"><span class="panel-title">Text to Video Prompt (សរសេរជាភាសាអង់គ្លេស)</span></div>
           <div class="panel-body">
             <span class="field-label">Visual Description</span>
-            <textarea id="t2v-prompt" class="prompt-ta" placeholder="ឧទាហរណ៍៖ ទិដ្ឋភាពទីក្រុង Cyberpunk ពេលយប់ មានភ្លៀងធ្លាក់..."></textarea>
+            <textarea id="t2v-prompt" class="prompt-ta" placeholder="Example: A cinematic shot of a futuristic cyberpunk city at night, neon lights, raining, 4k resolution..."></textarea>
           </div>
         </div>
-        <button class="gen-btn" onclick="generateRealVideo('text')">▶ GENERATE VIDEO</button>
-      </div>
-
-      <div id="i2v-engine" style="display: none;">
-        <div class="panel-card">
-          <div class="panel-header"><span class="panel-title">Image to Video Prompt</span></div>
-          <div class="panel-body">
-            <span class="field-label">Upload Image (បញ្ចូលរូបភាព)</span>
-            <div class="setting-select" style="text-align: center; cursor: pointer;">📁 ចុចដើម្បីជ្រើសរើសរូបភាព</div>
-            <br>
-            <span class="field-label">Motion Description (ពណ៌នាចលនា)</span>
-            <textarea id="i2v-prompt" class="prompt-ta" placeholder="ឧទាហរណ៍៖ ធ្វើឱ្យទឹកហូរ និងពពកផ្លាស់ទី..."></textarea>
-          </div>
-        </div>
-        <button class="gen-btn" onclick="generateRealVideo('image')">▶ ANIMATE IMAGE</button>
+        <button id="gen-btn" class="gen-btn" onclick="generateRealVideo()">▶ GENERATE VIDEO</button>
       </div>
 
     </div>
 
     <div class="output-panel">
       <div class="preview-screen" id="preview-box">
-        រង់ចាំការបញ្ជា... <br><br> សូមជ្រើសរើសមុខងារ ហើយចុច Generate។
+        រង់ចាំការបញ្ជា... <br><br> សូមបញ្ចូល API Key និង Prompt។
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // មុខងារប្តូរ Tab រវាង Text និង Image
-  function switchEngine(mode, btn) {
-    document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    document.getElementById('t2v-engine').style.display = 'none';
-    document.getElementById('i2v-engine').style.display = 'none';
-    
-    if(mode === 't2v') {
-      document.getElementById('t2v-engine').style.display = 'block';
-      document.getElementById('preview-box').innerHTML = "🎬 មុខងារ Text-to-Video រួចរាល់។";
-    } else {
-      document.getElementById('i2v-engine').style.display = 'block';
-      document.getElementById('preview-box').innerHTML = "🖼️ មុខងារ Image-to-Video រួចរាល់។";
-    }
-  }
-
-  // មុខងារលោតសារនៅពេលចុច Generate
-  async function generateRealVideo(type) {
-    let promptText = "";
-    if(type === 'text') promptText = document.getElementById('t2v-prompt').value;
-    if(type === 'image') promptText = document.getElementById('i2v-prompt').value;
-
+  async function generateRealVideo() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    const promptText = document.getElementById('t2v-prompt').value.trim();
     const previewBox = document.getElementById('preview-box');
+    const btn = document.getElementById('gen-btn');
 
+    if (!apiKey || !apiKey.startsWith('r8_')) {
+      alert("❌ សូម Paste កូដ API Key ឲ្យបានត្រឹមត្រូវ! (វាត្រូវផ្តើមដោយអក្សរ r8_)");
+      return;
+    }
     if (!promptText) {
-      alert("សូមបញ្ចូលអត្ថបទ (Prompt) របស់អ្នកជាមុនសិន!");
+      alert("❌ សូមសរសេរអត្ថបទអង់គ្លេសពណ៌នាពីវីដេអូដែលអ្នកចង់បានសិន!");
       return;
     }
 
-    // ពេលនេះវានឹងលោតអក្សរយ៉ាងស្អាតនៅលើប្រអប់ខាងស្តាំ
+    btn.disabled = true;
+    btn.innerText = "⏳ កំពុងដំណើរការ...";
+    
     previewBox.innerHTML = `
-      <div style="text-align: center; font-family: 'Space Mono', monospace;">
-        <span style="color: var(--a1); font-size: 16px;">កំពុងបញ្ជូនសំណើទៅកាន់ Video AI... 🎬</span><br><br>
-        <span style="color: var(--text);">Prompt: "${promptText}"</span><br><br>
-        <span style="color: var(--muted2); font-size: 12px;">ចំណាំ៖ ការបង្កើតវីដេអូ AI អាចចំណាយពេលពី ១ ទៅ ៣ នាទី។</span>
+      <div style="text-align: center;">
+        <span style="color: var(--a1); font-size: 16px;">⏳ កំពុងដាស់ខួរក្បាល AI...</span><br><br>
+        <span style="color: var(--muted2); font-size: 12px;">កំពុងបញ្ជូនសំណើ។ សូមរង់ចាំប្រហែល ១ ទៅ ៣ នាទី។ កុំបិទទំព័រនេះឲ្យសោះ។</span>
       </div>
     `;
+
+    try {
+      const proxy = "https://corsproxy.io/?";
+      const apiUrl = "https://api.replicate.com/v1/predictions";
+      
+      // ប្រើម៉ូដែល AI បង្កើតវីដេអូ: Zeroscope
+      const response = await fetch(proxy + encodeURIComponent(apiUrl), {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: "924747018af562286fb71b28c523e3dda66a22c9fc3ead6f3ba15430ab882623",
+          input: { prompt: promptText }
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || "API របស់អ្នកមានបញ្ហា ឬខ្វះសិទ្ធិ (Replicate)");
+      }
+
+      let prediction = await response.json();
+
+      while (prediction.status !== "succeeded" && prediction.status !== "failed") {
+        await new Promise(r => setTimeout(r, 3000));
+        previewBox.innerHTML = `
+          <div style="text-align: center;">
+            <span style="color: var(--a2); font-size: 16px;">🎬 កំពុងគូររូបភាព និងបង្កើតចលនា...</span><br><br>
+            <span style="color: var(--text); font-size: 14px;">ស្ថានភាព: ${prediction.status.toUpperCase()}</span><br><br>
+            <span style="color: var(--muted2); font-size: 12px;">ដំណើរការនេះអាចប្រើពេលបន្តិច...</span>
+          </div>
+        `;
+        const pollResponse = await fetch(proxy + encodeURIComponent(prediction.urls.get), {
+          headers: { "Authorization": "Bearer " + apiKey }
+        });
+        prediction = await pollResponse.json();
+      }
+
+      if (prediction.status === "succeeded") {
+        const videoUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+        previewBox.innerHTML = `
+          <video style="width: 100%; border-radius: 12px; border: 2px solid var(--a1);" controls autoplay loop>
+            <source src="${videoUrl}" type="video/mp4">
+          </video>
+        `;
+      } else {
+        throw new Error(prediction.error || "ការបង្កើតបរាជ័យ");
+      }
+
+    } catch (error) {
+      previewBox.innerHTML = `
+        <div style="color: #ff4d4d; font-size: 14px; padding: 20px;">
+          ❌ មានបញ្ហា:<br><br>${error.message}<br><br>
+        </div>
+      `;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "▶ GENERATE VIDEO";
+    }
   }
 </script>
 </body>
