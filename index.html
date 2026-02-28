@@ -6,106 +6,82 @@
 <title>VIXEL — AI Video Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #090212; --s1: #120524; --s2: #1a0833;
-  --a1: #00e5ff; --a2: #d900ff; --text: #e0fbfc; --muted: #6b6b8a;
-}
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
-nav { display: flex; align-items: center; justify-content: center; height: 60px; background: rgba(9,2,18,0.9); border-bottom: 1px solid rgba(0,229,255,0.2); position: sticky; top:0; z-index: 100; }
-.logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: white; text-decoration: none; }
-.logo span { color: var(--a1); }
-.wrapper { max-width: 800px; margin: 0 auto; padding: 20px; }
-.panel-card { background: var(--s1); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.panel-title { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--a1); text-transform: uppercase; margin-bottom: 12px; display: block; }
-.field-label { font-size: 10px; color: var(--muted); margin-bottom: 6px; display: block; }
-.input-field { width: 100%; background: var(--s2); border: 1px solid rgba(217,0,255,0.2); border-radius: 8px; padding: 12px; color: #fff; font-family: 'Space Mono', monospace; font-size: 13px; outline: none; }
-.prompt-ta { min-height: 100px; resize: vertical; }
-.gen-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--a1), var(--a2)); color: #000; border: none; border-radius: 12px; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
-.gen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.preview-box { width: 100%; aspect-ratio: 16/9; background: #000; border: 1px dashed var(--muted); border-radius: 12px; margin-top: 20px; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; font-size: 12px; color: var(--muted); padding: 15px; }
-video { width: 100%; height: 100%; border-radius: 8px; }
+:root { --bg: #090212; --s1: #120524; --a1: #00e5ff; --a2: #d900ff; --text: #e0fbfc; --muted: #6b6b8a; }
+body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+.card { background: var(--s1); border: 1px solid rgba(0,229,255,0.2); border-radius: 15px; padding: 20px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 3px; color: var(--a1); margin-top: 0; }
+.label { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; }
+input, textarea { width: 100%; background: #1a0833; border: 1px solid rgba(217,0,255,0.3); border-radius: 8px; padding: 12px; color: white; font-family: 'Space Mono', monospace; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+.gen-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--a1), var(--a2)); border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 20px; cursor: pointer; color: black; transition: 0.3s; }
+.gen-btn:disabled { opacity: 0.5; }
+#status { margin-top: 20px; width: 100%; max-width: 500px; text-align: center; font-size: 14px; color: var(--a1); }
+video { width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid var(--a1); }
 </style>
 </head>
 <body>
 
-<nav><a href="#" class="logo">VI<span>XEL</span> AI</a></nav>
-
-<div class="wrapper">
-  <div class="panel-card" style="border-color: var(--a2);">
-    <span class="panel-title">🔑 API CONFIGURATION</span>
-    <span class="field-label">Replicate API Token (r8_...)</span>
-    <input type="password" id="apiKey" class="input-field" placeholder="Paste your secret token here">
-  </div>
-
-  <div class="panel-card">
-    <span class="panel-title">🎬 GENERATION PANEL</span>
-    <span class="field-label">Video Prompt (English Only)</span>
-    <textarea id="prompt" class="input-field prompt-ta" placeholder="e.g. A futuristic robot walking in a forest, 4k, cinematic..."></textarea>
-  </div>
-
-  <button id="genBtn" class="gen-btn" onclick="runAI()">START GENERATION</button>
-
-  <div id="statusBox" class="preview-box">រង់ចាំការបញ្ជា...</div>
+<div class="card">
+    <h2>VIXEL AI VIDEO</h2>
+    <span class="label">API KEY (R8_...)</span>
+    <input type="password" id="key" placeholder="បញ្ចូល API Key របស់អ្នក">
+    
+    <span class="label">VIDEO PROMPT (ENGLISH)</span>
+    <textarea id="prompt" rows="3" placeholder="ឧទាហរណ៍: A cat flying in space, 4k..."></textarea>
+    
+    <button id="btn" class="gen-btn" onclick="generate()">START GENERATION</button>
 </div>
 
+<div id="status">ត្រៀមខ្លួនរួចរាល់...</div>
+
 <script>
-async function runAI() {
-  const token = document.getElementById('apiKey').value.trim();
-  const prompt = document.getElementById('prompt').value.trim();
-  const status = document.getElementById('statusBox');
-  const btn = document.getElementById('genBtn');
+async function generate() {
+    const key = document.getElementById('key').value.trim();
+    const prompt = document.getElementById('prompt').value.trim();
+    const btn = document.getElementById('btn');
+    const status = document.getElementById('status');
 
-  if (!token || !prompt) return alert("សូមបំពេញ API Key និង Prompt ឱ្យគ្រប់គ្រាន់!");
+    if(!key || !prompt) return alert("សូមបំពេញឱ្យគ្រប់!");
 
-  btn.disabled = true;
-  status.innerHTML = "⏳ កំពុងទាក់ទងទៅ AI... សូមរង់ចាំ (១-៣ នាទី)";
+    btn.disabled = true;
+    status.innerHTML = "⏳ កំពុងផ្ញើសំណើទៅ AI... (អាចប្រើពេល ១-៣ នាទី)";
 
-  try {
-    // ជំហានទី ១: បង្កើត Prediction
-    const resp = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://api.replicate.com/v1/predictions"), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        method: "POST",
-        headers: { "Authorization": `Token ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          version: "924747018af562286fb71b28c523e3dda66a22c9fc3ead6f3ba15430ab882623",
-          input: { prompt: prompt }
-        })
-      })
-    });
+    try {
+        const res = await fetch("https://api.replicate.com/v1/predictions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Token ${key}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                version: "924747018af562286fb71b28c523e3dda66a22c9fc3ead6f3ba15430ab882623",
+                input: { prompt: prompt }
+            })
+        });
 
-    const dataRaw = await resp.json();
-    let prediction = JSON.parse(dataRaw.contents);
+        let data = await res.json();
+        if(data.detail) throw new Error(data.detail);
 
-    if (prediction.error) throw new Error(prediction.error);
+        const getUrl = data.urls.get;
 
-    // ជំហានទី ២: តាមដានស្ថានភាព (Polling)
-    const checkUrl = prediction.urls.get;
-    
-    while (prediction.status !== "succeeded" && prediction.status !== "failed") {
-      await new Promise(r => setTimeout(r, 4000));
-      const pollResp = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(checkUrl), {
-        headers: { "Authorization": `Token ${token}` }
-      });
-      const pollDataRaw = await pollResp.json();
-      prediction = JSON.parse(pollDataRaw.contents);
-      status.innerHTML = `🎬 កំពុងផលិតវីដេអូ... (ស្ថានភាព: ${prediction.status})`;
+        while (data.status !== "succeeded" && data.status !== "failed") {
+            await new Promise(r => setTimeout(r, 3000));
+            const check = await fetch(getUrl, {
+                headers: { "Authorization": `Token ${key}` }
+            });
+            data = await check.json();
+            status.innerHTML = `🎬 កំពុងផលិតវីដេអូ... (ស្ថានភាព: ${data.status})`;
+        }
+
+        if (data.status === "succeeded") {
+            status.innerHTML = `<video src="${data.output[0]}" controls autoplay loop></video><br>✅ រួចរាល់!`;
+        } else {
+            status.innerHTML = "❌ បរាជ័យ!";
+        }
+    } catch (e) {
+        status.innerHTML = "❌ បញ្ហា: " + e.message;
+    } finally {
+        btn.disabled = false;
     }
-
-    if (prediction.status === "succeeded") {
-      const videoUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
-      status.innerHTML = `<video src="${videoUrl}" controls autoplay loop></video>`;
-    } else {
-      status.innerHTML = "❌ ការបង្កើតបរាជ័យ!";
-    }
-
-  } catch (err) {
-    status.innerHTML = "❌ មានបញ្ហា: " + err.message;
-  } finally {
-    btn.disabled = false;
-  }
 }
 </script>
 </body>
